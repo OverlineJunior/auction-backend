@@ -15,8 +15,7 @@
 
 # Roadmap
 
-- [ ] Determine the scope and write down every endpoint the auction back-end needs to handle
-- [ ] Determine the tech stack, including the reasoning behind each choice
+- [ ] Draw an User Flow Diagram so we get an idea of what the back-end needs to handle
 - [ ] Draw an Entity Relationship Diagram (ERD) and then implement the data model
 - [ ] Implement a minimal CRUD API
 - [ ] Handle concurrency and related edge cases
