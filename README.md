@@ -1,3 +1,7 @@
+# User Flow Diagram
+
+![User Flow Diagram](./assets/user-flow-diagram.svg)
+
 # Tech Stack
 
 - **Language:** TypeScript
