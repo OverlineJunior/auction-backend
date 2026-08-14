@@ -5,11 +5,13 @@
 # Tech Stack
 
 - **Language:** TypeScript
-- **Runtime:** Bun
-- **Framework:** Elysia
-- **ORM:** Drizzle
+- **Runtime:** NPM
+- **Framework:** Express
+- **ORM:** Prisma
 - **Database:** PostgreSQL
-- **Hosting:** Neon
+- **Hosting:** AWS[^1]
+
+[^1]: We'll start with Railway first, then migrate to AWS once the project is ready.
 
 # Roadmap
 
