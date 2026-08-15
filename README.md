@@ -9,7 +9,8 @@
 # Tech Stack
 
 - **Language:** TypeScript
-- **Runtime:** NPM
+- **Runtime:** Node.js
+- **Package Manager:** NPM
 - **Framework:** Express
 - **ORM:** Prisma
 - **Database:** PostgreSQL
@@ -41,6 +42,8 @@
   - [ ] Test simultaneous outbid scenarios
 - [ ] **7. Background Tasks & Lifecycle**
   - [ ] Scheduled worker to detect expired auctions and assign `winner_id`
-- [ ] **8. Integration Testing & Packaging**
+- [ ] **8. Integration Testing, Packaging & Deployment**
   - [ ] Integration tests against the live database
   - [ ] Multi-stage Dockerfile for backend service deployment
+  - [ ] Deploy initial MVP and managed PostgreSQL on Railway
+  - [ ] *(Post-Launch)* Migrate infrastructure to AWS (ECS/App Runner + RDS)
