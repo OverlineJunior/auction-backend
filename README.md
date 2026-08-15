@@ -20,9 +20,9 @@
 
 # Roadmap
 
-- [ ] **1. Design**
-  - [ ] Draw user flow diagram
-  - [ ] Draw entity relationship diagram
+- [x] **1. Design**
+  - [x] Draw user flow diagram
+  - [x] Draw entity relationship diagram
 - [ ] **2. Architecture Setup**
   - [ ] Define repository interfaces (`UserRepository`, `AuctionRepository`, `BidRepository`)
   - [ ] Implement the repositories with in-memory storage (for early testing)
