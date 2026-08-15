@@ -2,6 +2,10 @@
 
 ![User Flow Diagram](./assets/user-flow-diagram.svg)
 
+# Entity Relationship Diagram
+
+![Entity Relationship Diagram](./assets/entity-relationship-diagram.svg)
+
 # Tech Stack
 
 - **Language:** TypeScript
