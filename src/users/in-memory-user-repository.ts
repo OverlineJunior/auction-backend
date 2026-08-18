@@ -1,9 +1,9 @@
-import type { CreateUser, User, UserRepository } from "./user-repository-interface.js"
+import type { NewUser, User, UserRepository } from "./user-repository-interface.js"
 
 export class InMemoryUserRepository implements UserRepository {
   private users: User[] = []
 
-  async create(user: CreateUser): Promise<User> {
+  async create(user: NewUser): Promise<User> {
     const newUser: User = { id: this.users.length + 1, ...user }
     this.users.push(newUser)
     return newUser
