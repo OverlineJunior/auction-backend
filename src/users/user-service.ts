@@ -42,6 +42,12 @@ export default class UserService {
     return { user, token }
   }
 
+  async getUserById(userId: number): Promise<SafeUser> {
+    const user = await this.userRepo.findById(userId)
+    if (!user) throw new Error("User not found")
+    return this.sanitizeUser(user)
+  }
+
   private normalizeEmail(email: string): string {
     return email.trim().toLowerCase()
   }
