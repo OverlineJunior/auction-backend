@@ -23,12 +23,12 @@
 - [x] **1. Design**
   - [x] Draw user flow diagram
   - [x] Draw entity relationship diagram
-- [ ] **2. Architecture Setup**
-  - [ ] Define repository interfaces (`UserRepository`, `AuctionRepository`, `BidRepository`)
-  - [ ] Implement the repositories with in-memory storage (for early testing)
-- [ ] **3. Authentication & Users**
-  - [ ] User registration, password hashing and login
-  - [ ] Auth middleware
+- [x] **2. Architecture Setup**
+  - [x] Define repository interfaces (`UserRepository`, `AuctionRepository`, `BidRepository`)
+  - [x] Implement the repositories with in-memory storage (for early testing)
+- [x] **3. Authentication & Users**
+  - [x] User registration, password hashing and login
+  - [x] Auth middleware
 - [ ] **4. Core Business Logic**
   - [ ] Auction creation and listing endpoints
   - [ ] Bidding logic and validation rules
