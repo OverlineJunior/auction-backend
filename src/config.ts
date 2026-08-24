@@ -25,6 +25,7 @@ const config = {
     secret: assertEnvVar("JWT_SECRET"),
     expiresIn: "1d",
   },
+  databaseUrl: assertEnvVar("DATABASE_URL"),
 } as const
 
 export default config
