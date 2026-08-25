@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "setup": "docker compose up -d && prisma migrate dev",
+    "postinstall": "prisma generate",
     "dev": "tsx watch src/index.ts",
     "build": "prisma generate && tsc",
     "migrate": "prisma migrate dev",
