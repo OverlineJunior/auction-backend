@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-interface JwtPayload {
+export interface AuthJwtPayload {
   userId: number
 }
 
@@ -30,7 +30,7 @@ export default function requireAuth(
   }
 
   try {
-    const payload = jwt.verify(token, config.jwt.secret) as JwtPayload
+    const payload = jwt.verify(token, config.jwt.secret) as AuthJwtPayload
     req.userId = payload.userId
     return next()
   } catch {
