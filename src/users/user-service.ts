@@ -9,7 +9,7 @@ export default class UserService {
   constructor(private userRepo: UserRepository) { }
 
   /** Panics if the email is already in use. */
-  async register(email: string, password: string): Promise<{ user: SafeUser; token: string }> {
+  async register(email: string, password: string): Promise<SafeUser> {
     const normalizedEmail = this.normalizeEmail(email)
     
     const existing = await this.userRepo.findByEmail(normalizedEmail)
@@ -20,14 +20,11 @@ export default class UserService {
       passwordHash: await bcrypt.hash(password, SALT_ROUNDS),
     })
 
-    const user = this.sanitizeUser(newUser)
-    const token = this.generateToken(newUser.id)
-  
-    return { user, token }
+    return this.sanitizeUser(newUser)
   }
 
   /** Panics if the e-mail is not registered or the password is invalid. */
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<{ user: SafeUser; token: string }> {
     const normalizedEmail = this.normalizeEmail(email)
     
     const registeredUser = await this.userRepo.findByEmail(normalizedEmail)

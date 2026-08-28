@@ -14,12 +14,11 @@ describe("User Service", () => {
       const userService = new UserService(userRepo)
       const rawPassword = "password123"
 
-      const result = await userService.register("test@example.com", rawPassword)
-      assert.equal(result.user.email, "test@example.com")
-      assert.ok(result.user.id, "User ID should be returned")
-      assert.ok(result.token, "Token should be returned")
+      const user = await userService.register("test@example.com", rawPassword)
+      assert.equal(user.email, "test@example.com")
+      assert.ok(user.id, "User ID should be returned")
 
-      const savedUser = await userRepo.findById(result.user.id)
+      const savedUser = await userRepo.findById(user.id)
       assert.ok(savedUser, "User should exist in repository")
     })
 
@@ -28,51 +27,32 @@ describe("User Service", () => {
       const userService = new UserService(userRepo)
       const rawPassword = "password123"
 
-      const result = await userService.register("test@example.com", rawPassword)
+      const registered = await userService.register("test@example.com", rawPassword)
 
-      const savedUser = await userRepo.findById(result.user.id)
-      assert.equal(
-        await bcrypt.compare(rawPassword, savedUser!.passwordHash),
-        true,
-      )
+      const saved = await userRepo.findById(registered.id)
+      assert.equal(await bcrypt.compare(rawPassword, saved!.passwordHash), true)
     })
 
     it("normalizes email (trims and converts to lowercase)", async () => {
       const userRepo = new InMemoryUserRepository()
       const userService = new UserService(userRepo)
 
-      const { user } = await userService.register(
-        "  TEST@EXAMPLE.COM ",
-        "password123",
-      )
+      const registered = await userService.register("  TEST@EXAMPLE.COM ", "password123")
 
-      const savedUser = await userRepo.findById(user.id)
-      assert.equal(savedUser!.email, "test@example.com")
+      const saved = await userRepo.findById(registered.id)
+      assert.equal(saved!.email, "test@example.com")
     })
 
     it("returns sanitized user data", async () => {
       const userRepo = new InMemoryUserRepository()
       const userService = new UserService(userRepo)
 
-      const { user } = await userService.register("test@example.com", "password123")
+      const user = await userService.register("test@example.com", "password123")
       assert.equal(
         "passwordHash" in user,
         false,
         "passwordHash should not be returned",
       )
-    })
-
-    it("returns a valid jwt token", async () => {
-      const userRepo = new InMemoryUserRepository()
-      const userService = new UserService(userRepo)
-    
-      const { user, token } = await userService.register(
-        "test@example.com",
-        "password123",
-      )
-    
-      const payload = jwt.verify(token, config.jwt.secret) as AuthJwtPayload
-      assert.equal(payload.userId, user.id)
     })
 
     it("throws an error when registering with an existing email", async () => {
@@ -89,15 +69,12 @@ describe("User Service", () => {
       const userRepo = new InMemoryUserRepository()
       const userService = new UserService(userRepo)
 
-      const { user: registered } = await userService.register(
-        "test@example.com",
-        "password123",
-      )
+      const registered = await userService.register("test@example.com", "password123")
 
-      const result = await userService.login("test@example.com", "password123")
-      assert.equal(result.user.id, registered.id)
-      assert.equal(result.user.email, "test@example.com")
-      assert.ok(result.token, "Token should be returned")
+      const { user, token } = await userService.login("test@example.com", "password123")
+      assert.equal(user.id, registered.id)
+      assert.equal(user.email, "test@example.com")
+      assert.ok(token, "Token should be returned")
     })
 
     it("returns sanitized user data", async () => {
@@ -118,31 +95,18 @@ describe("User Service", () => {
       const userRepo = new InMemoryUserRepository()
       const userService = new UserService(userRepo)
 
-      const { user: registered } = await userService.register(
-        "test@example.com",
-        "password123",
-      )
-
-      const { user } = await userService.login(
-        "  TEST@EXAMPLE.COM ",
-        "password123",
-      )
-      assert.equal(user.id, registered.id)
+      const registered = await userService.register("test@example.com", "password123")
+      const { user: logged } = await userService.login("  TEST@EXAMPLE.COM ", "password123")
+      assert.equal(logged.id, registered.id)
     })
 
     it("returns a valid jwt token", async () => {
       const userRepo = new InMemoryUserRepository()
       const userService = new UserService(userRepo)
 
-      const { user: registered } = await userService.register(
-        "test@example.com",
-        "password123",
-      )
+      const registered = await userService.register("test@example.com", "password123")
 
-      const { user, token } = await userService.login(
-        "test@example.com",
-        "password123",
-      )
+      const { user, token } = await userService.login("test@example.com", "password123")
 
       const payload = jwt.verify(token, config.jwt.secret) as AuthJwtPayload
       assert.equal(payload.userId, user.id)
@@ -153,9 +117,7 @@ describe("User Service", () => {
       const userRepo = new InMemoryUserRepository()
       const userService = new UserService(userRepo)
 
-      await assert.rejects(
-        userService.login("test@example.com", "password123"),
-      )
+      await assert.rejects(userService.login("test@example.com", "password123"))
     })
 
     it("throws an error when the password is invalid", async () => {
@@ -164,9 +126,7 @@ describe("User Service", () => {
 
       await userService.register("test@example.com", "password123")
 
-      await assert.rejects(
-        userService.login("test@example.com", "wrongpassword"),
-      )
+      await assert.rejects(userService.login("test@example.com", "wrongpassword"))
     })
   })
 
@@ -175,10 +135,7 @@ describe("User Service", () => {
       const userRepo = new InMemoryUserRepository()
       const userService = new UserService(userRepo)
 
-      const { user: registered } = await userService.register(
-        "test@example.com",
-        "password123",
-      )
+      const registered = await userService.register("test@example.com", "password123")
 
       const user = await userService.getUserById(registered.id)
       assert.equal(user.id, registered.id)
@@ -189,10 +146,7 @@ describe("User Service", () => {
       const userRepo = new InMemoryUserRepository()
       const userService = new UserService(userRepo)
 
-      const { user: registered } = await userService.register(
-        "test@example.com",
-        "password123",
-      )
+      const registered = await userService.register("test@example.com", "password123")
 
       const user = await userService.getUserById(registered.id)
       assert.equal(
