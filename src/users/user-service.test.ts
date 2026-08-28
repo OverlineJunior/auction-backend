@@ -78,9 +78,135 @@ describe("User Service", () => {
     it("throws an error when registering with an existing email", async () => {
       const userRepo = new InMemoryUserRepository()
       const userService = new UserService(userRepo)
-      
+
       await userService.register("test@example.com", "password123")
       await assert.rejects(userService.register("test@example.com", "password123"))
+    })
+  })
+
+  describe("login()", () => {
+    it("successfully logs in a registered user", async () => {
+      const userRepo = new InMemoryUserRepository()
+      const userService = new UserService(userRepo)
+
+      const { user: registered } = await userService.register(
+        "test@example.com",
+        "password123",
+      )
+
+      const result = await userService.login("test@example.com", "password123")
+      assert.equal(result.user.id, registered.id)
+      assert.equal(result.user.email, "test@example.com")
+      assert.ok(result.token, "Token should be returned")
+    })
+
+    it("returns sanitized user data", async () => {
+      const userRepo = new InMemoryUserRepository()
+      const userService = new UserService(userRepo)
+
+      await userService.register("test@example.com", "password123")
+
+      const { user } = await userService.login("test@example.com", "password123")
+      assert.equal(
+        "passwordHash" in user,
+        false,
+        "passwordHash should not be returned",
+      )
+    })
+
+    it("normalizes email (trims and converts to lowercase)", async () => {
+      const userRepo = new InMemoryUserRepository()
+      const userService = new UserService(userRepo)
+
+      const { user: registered } = await userService.register(
+        "test@example.com",
+        "password123",
+      )
+
+      const { user } = await userService.login(
+        "  TEST@EXAMPLE.COM ",
+        "password123",
+      )
+      assert.equal(user.id, registered.id)
+    })
+
+    it("returns a valid jwt token", async () => {
+      const userRepo = new InMemoryUserRepository()
+      const userService = new UserService(userRepo)
+
+      const { user: registered } = await userService.register(
+        "test@example.com",
+        "password123",
+      )
+
+      const { user, token } = await userService.login(
+        "test@example.com",
+        "password123",
+      )
+
+      const payload = jwt.verify(token, config.jwt.secret) as AuthJwtPayload
+      assert.equal(payload.userId, user.id)
+      assert.equal(payload.userId, registered.id)
+    })
+
+    it("throws an error when the email is not registered", async () => {
+      const userRepo = new InMemoryUserRepository()
+      const userService = new UserService(userRepo)
+
+      await assert.rejects(
+        userService.login("test@example.com", "password123"),
+      )
+    })
+
+    it("throws an error when the password is invalid", async () => {
+      const userRepo = new InMemoryUserRepository()
+      const userService = new UserService(userRepo)
+
+      await userService.register("test@example.com", "password123")
+
+      await assert.rejects(
+        userService.login("test@example.com", "wrongpassword"),
+      )
+    })
+  })
+
+  describe("getUserById()", () => {
+    it("returns the user for an existing id", async () => {
+      const userRepo = new InMemoryUserRepository()
+      const userService = new UserService(userRepo)
+
+      const { user: registered } = await userService.register(
+        "test@example.com",
+        "password123",
+      )
+
+      const user = await userService.getUserById(registered.id)
+      assert.equal(user.id, registered.id)
+      assert.equal(user.email, "test@example.com")
+    })
+
+    it("returns sanitized user data", async () => {
+      const userRepo = new InMemoryUserRepository()
+      const userService = new UserService(userRepo)
+
+      const { user: registered } = await userService.register(
+        "test@example.com",
+        "password123",
+      )
+
+      const user = await userService.getUserById(registered.id)
+      assert.equal(
+        "passwordHash" in user,
+        false,
+        "passwordHash should not be returned",
+      )
+    })
+
+    it("throws an error when the user does not exist", async () => {
+      const userRepo = new InMemoryUserRepository()
+      const userService = new UserService(userRepo)
+
+      await assert.rejects(userService.getUserById(999))
     })
   })
 })
