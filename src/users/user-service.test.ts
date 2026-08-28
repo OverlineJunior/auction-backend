@@ -3,6 +3,7 @@ import { describe, it } from "node:test"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import config from "../config.js"
+import { AuthError, ConflictError, NotFoundError } from "../errors.js"
 import type { AuthJwtPayload } from "../middleware/auth-middleware.js"
 import { InMemoryUserRepository } from "./in-memory-user-repository.js"
 import UserService from "./user-service.js"
@@ -56,7 +57,7 @@ describe("User Service", () => {
 			const userService = new UserService(userRepo)
 
 			await userService.register("test@example.com", "password123")
-			await assert.rejects(userService.register("test@example.com", "password123"))
+			await assert.rejects(userService.register("test@example.com", "password123"), ConflictError)
 		})
 	})
 
@@ -109,7 +110,7 @@ describe("User Service", () => {
 			const userRepo = new InMemoryUserRepository()
 			const userService = new UserService(userRepo)
 
-			await assert.rejects(userService.login("test@example.com", "password123"))
+			await assert.rejects(userService.login("test@example.com", "password123"), AuthError)
 		})
 
 		it("throws an error when the password is invalid", async () => {
@@ -118,7 +119,7 @@ describe("User Service", () => {
 
 			await userService.register("test@example.com", "password123")
 
-			await assert.rejects(userService.login("test@example.com", "wrongpassword"))
+			await assert.rejects(userService.login("test@example.com", "wrongpassword"), AuthError)
 		})
 	})
 
@@ -148,7 +149,7 @@ describe("User Service", () => {
 			const userRepo = new InMemoryUserRepository()
 			const userService = new UserService(userRepo)
 
-			await assert.rejects(userService.getUserById(999))
+			await assert.rejects(userService.getUserById(999), NotFoundError)
 		})
 	})
 })
