@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import config from "../config.js"
+import { AuthError, ConflictError, NotFoundError } from "../errors.js"
 import type { SafeUser, User, UserRepository } from "./user-repository-interface.js"
 
 const SALT_ROUNDS = 10
@@ -13,7 +14,7 @@ export default class UserService {
 		const normalizedEmail = this.normalizeEmail(email)
 
 		const existing = await this.userRepo.findByEmail(normalizedEmail)
-		if (existing) throw new Error("E-mail already in use")
+		if (existing) throw new ConflictError("E-mail already in use")
 
 		const newUser = await this.userRepo.create({
 			email: normalizedEmail,
@@ -28,10 +29,10 @@ export default class UserService {
 		const normalizedEmail = this.normalizeEmail(email)
 
 		const registeredUser = await this.userRepo.findByEmail(normalizedEmail)
-		if (!registeredUser) throw new Error("Invalid credentials")
+		if (!registeredUser) throw new AuthError()
 
 		const isPasswordValid = await bcrypt.compare(password, registeredUser.passwordHash)
-		if (!isPasswordValid) throw new Error("Invalid credentials")
+		if (!isPasswordValid) throw new AuthError()
 
 		const user = this.sanitizeUser(registeredUser)
 		const token = this.generateToken(registeredUser.id)
@@ -39,9 +40,10 @@ export default class UserService {
 		return { user, token }
 	}
 
+	/** Panics if the user is not found. */
 	async getUserById(userId: number): Promise<SafeUser> {
 		const user = await this.userRepo.findById(userId)
-		if (!user) throw new Error("User not found")
+		if (!user) throw new NotFoundError("User not found")
 		return this.sanitizeUser(user)
 	}
 
